@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+input::placeholder {
+  color: #777;
+  opacity: 1;
+}body {
+  margin: 0;
+  font-family: Arial;
+  background: #f4f6f8;
+}
+
+/* LOGIN */
+.login-bg {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-card input {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.login-card button {
+  background: #611232;
+  color: white;
+  padding: 10px;
+  border: none;
+}
+
+/* DASHBOARD */
+.header {
+  background: #611232;
+  color: white;
+  padding: 15px;
+  font-weight: bold;
+}
+
+.main {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  background: white;
+  min-height: 100vh;
+  padding: 20px;
+  border-right: 1px solid #eee;
+}
+
+.content {
+  flex: 1;
+  padding: 30px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.card input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.card button {
+  margin-top: 10px;
+  background: #611232;
+  color: white;
+  padding: 10px;
+  border: none;
+}
+
+table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+td, th {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
