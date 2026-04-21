@@ -17,7 +17,7 @@ export default function Admin() {
     curp: '',
     concepto: '',
     status: '',
-    aportacion: '' // string formateado
+    aportacion: ''
   })
 
   // 🔐 LOGIN
@@ -32,7 +32,7 @@ export default function Admin() {
     }
   }
 
-  // 📥 CARGAR
+  // 📥 CARGAR CLIENTES
   const cargarClientes = async () => {
     const { data } = await supabase
       .from('clientes')
@@ -42,7 +42,7 @@ export default function Admin() {
     setClientes(data || [])
   }
 
-  // 💰 FORMATEAR DINERO
+  // 💰 FORMATO DINERO
   const formatearDinero = (valor: string) => {
     const limpio = valor.replace(/\D/g, '')
     return limpio.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -56,21 +56,9 @@ export default function Admin() {
       return
     }
 
-    const curpLimpia = form.curp.toUpperCase().trim()
-
-    const { data: existente } = await supabase
-      .from('clientes')
-      .select('*')
-      .eq('curp', curpLimpia)
-
-    if (existente && existente.length > 0 && !editandoId) {
-      alert('Ya existe ese CURP')
-      return
-    }
-
     const dataFinal = {
       nombre: form.nombre.trim(),
-      curp: curpLimpia,
+      curp: form.curp.toUpperCase(),
       concepto: form.concepto,
       status: form.status,
       aportacion: Number(form.aportacion.replace(/,/g, '')) || 0
@@ -78,11 +66,9 @@ export default function Admin() {
 
     if (editandoId) {
       await supabase.from('clientes').update(dataFinal).eq('id', editandoId)
-      alert('Actualizado')
       setEditandoId(null)
     } else {
       await supabase.from('clientes').insert([dataFinal])
-      alert('Guardado')
     }
 
     setForm({
@@ -98,7 +84,6 @@ export default function Admin() {
 
   // 🗑 ELIMINAR
   const eliminar = async (id:number) => {
-    if (!confirm('¿Eliminar cliente?')) return
     await supabase.from('clientes').delete().eq('id', id)
     cargarClientes()
   }
@@ -115,17 +100,6 @@ export default function Admin() {
         : ''
     })
     setEditandoId(c.id)
-  }
-
-  const cancelar = () => {
-    setEditandoId(null)
-    setForm({
-      nombre: '',
-      curp: '',
-      concepto: '',
-      status: '',
-      aportacion: ''
-    })
   }
 
   useEffect(() => {
@@ -149,7 +123,7 @@ export default function Admin() {
   }
 
   return (
-    <div style={{background:'#f4f6f8', minHeight:'100vh', padding:'30px'}}>
+    <div style={container}>
 
       <h1 style={{color:'#222'}}>Panel Administrativo</h1>
 
@@ -157,7 +131,7 @@ export default function Admin() {
 
         {/* FORM */}
         <div style={card}>
-          <h3>{editandoId ? 'Editar cliente' : 'Nuevo cliente'}</h3>
+          <h3>Nuevo cliente</h3>
 
           <input placeholder="Nombre" value={form.nombre} onChange={e=>setForm({...form,nombre:e.target.value})} style={input}/>
           <input placeholder="CURP" value={form.curp} onChange={e=>setForm({...form,curp:e.target.value.toUpperCase()})} style={input}/>
@@ -169,7 +143,6 @@ export default function Admin() {
             <option value="Pendiente">Pendiente</option>
           </select>
 
-          {/* 💰 INPUT DINERO */}
           <input
             placeholder="Aportación"
             value={form.aportacion}
@@ -181,22 +154,15 @@ export default function Admin() {
           />
 
           <button onClick={guardar} style={btn}>
-            {editandoId ? 'Actualizar cliente' : 'Guardar cliente'}
+            {editandoId ? 'Actualizar' : 'Guardar'}
           </button>
-
-          {editandoId && (
-            <button onClick={cancelar} style={{...btn, background:'#888'}}>
-              Cancelar
-            </button>
-          )}
-
         </div>
 
         {/* TABLA */}
         <div style={card}>
           <h3>Clientes registrados</h3>
 
-          <table style={{width:'100%', borderCollapse:'collapse'}}>
+          <table style={{width:'100%'}}>
             <thead>
               <tr>
                 <th style={th}>Nombre</th>
@@ -213,19 +179,10 @@ export default function Admin() {
                   <td style={td}>{c.nombre}</td>
                   <td style={td}>{c.curp}</td>
                   <td style={td}>{c.status}</td>
-
+                  <td style={td}>${Number(c.aportacion || 0).toLocaleString()}</td>
                   <td style={td}>
-                    ${Number(c.aportacion || 0).toLocaleString()}
-                  </td>
-
-                  <td style={td}>
-                    <button onClick={()=>editar(c)} style={{...btn, marginRight:'5px'}}>
-                      Editar
-                    </button>
-
-                    <button onClick={()=>eliminar(c.id)} style={deleteBtn}>
-                      Eliminar
-                    </button>
+                    <button onClick={()=>editar(c)} style={btn}>Editar</button>
+                    <button onClick={()=>eliminar(c.id)} style={deleteBtn}>Eliminar</button>
                   </td>
                 </tr>
               ))}
@@ -240,7 +197,13 @@ export default function Admin() {
   )
 }
 
-/* 🎨 ESTILOS */
+/* 🎨 ESTILOS CORREGIDOS */
+
+const container = {
+  background:'#f4f6f8',
+  minHeight:'100vh',
+  padding:'30px'
+}
 
 const bg = {
   height:'100vh',
@@ -263,8 +226,7 @@ const card = {
   borderRadius:'10px',
   boxShadow:'0 5px 15px rgba(0,0,0,0.1)',
   display:'flex',
-  flexDirection:'column',
-  gap:'10px'
+  flexDirection:'column' as 'column' // 🔥 CORREGIDO
 }
 
 const input = {
@@ -272,7 +234,8 @@ const input = {
   border:'1px solid #ccc',
   borderRadius:'6px',
   color:'#222',
-  background:'#fff'
+  background:'#fff',
+  marginBottom:'10px'
 }
 
 const btn = {
@@ -281,7 +244,8 @@ const btn = {
   padding:'10px',
   border:'none',
   borderRadius:'6px',
-  cursor:'pointer'
+  cursor:'pointer',
+  marginTop:'5px'
 }
 
 const deleteBtn = {
@@ -289,11 +253,12 @@ const deleteBtn = {
   color:'white',
   border:'none',
   padding:'8px',
-  borderRadius:'4px'
+  borderRadius:'4px',
+  marginLeft:'5px'
 }
 
 const th = {
-  textAlign:'left',
+  textAlign:'left' as 'left',
   padding:'10px',
   color:'#333'
 }
