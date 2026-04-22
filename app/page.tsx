@@ -199,7 +199,10 @@ export default function Home() {
               <p><strong>CURP:</strong> {resultado.curp}</p>
               <p><strong>Concepto:</strong> {resultado.concepto}</p>
               <p><strong>Status:</strong> {resultado.status}</p>
-              <p><strong>Aportación:</strong> ${resultado.aportacion}</p>
+              <p><strong>Aportación:</strong> ${Number(resultado.aportacion || 0).toLocaleString()}</p>
+              <p><strong>Cantidad a recibir:</strong>
+                ${Number(resultado.cantidad_recibir || 0).toLocaleString()}
+              </p>
 
               <br />
 
